@@ -1,0 +1,49 @@
+name: Build nxnative Engine
+
+on:
+  workflow_dispatch: # 允许你手动触发这个工作流
+
+jobs:
+  build-engine:
+    runs-on: macos-latest # 使用 GitHub 托管的 macOS 运行器
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Accept Xcode License
+        run: |
+          sudo xcodebuild -license accept
+          # 可能还需要运行首次启动安装程序，可选项
+          # sudo xcodebuild -runFirstLaunch
+
+      - name: Download Metal Toolchain
+        run: xcodebuild -downloadComponent MetalToolchain
+
+      - name: Install Homebrew dependencies
+        run: |
+          brew install xcodegen zstd glslang
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install lz4 "capstone>=5,<6" fonttools nsz zbic
+
+      # 这里的构建命令需要参考 nxnative 的文档。
+      # 根据 docs/development.md，核心构建可能涉及 make 或 python 脚本。
+      # 一个可能的占位命令是：
+      - name: Build engine
+        run: |
+          # 请根据 nxnative/docs/development.md 替换为实际的构建命令
+          # 例如，如果存在一个 build.sh 脚本：
+          # ./build.sh --engine-only
+          echo "Engine build step placeholder"
+
+      - name: Upload engine artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nxnative-engine-build
+          path: |
+            # 将这里替换为构建产物实际输出的目录
+            # 例如，如果引擎二进制文件在 build/ 目录下：
+            build/
+            # 或者包含编译好的引擎的特定文件夹
